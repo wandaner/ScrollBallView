@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MyScrollView.iml" filepath="$PROJECT_DIR$/MyScrollView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ScrollBallView.iml" filepath="$PROJECT_DIR$/ScrollBallView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

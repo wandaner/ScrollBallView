@@ -139,7 +139,7 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
         //获取触摸事件在屏幕上的位置
         final int rawX = (int) ev.getRawX();
         final int rawY = (int) ev.getRawY();
-        Log.e(TAG,"-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
+
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // 重置isMoveAction
@@ -150,6 +150,7 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
                 // 记录点击事件点下的位置，用于判断点击或者滑动
                 startX = x;
                 startY = y;
+                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
                 break;
             case MotionEvent.ACTION_MOVE:
                 // When action move set isMoveAction true.
@@ -172,6 +173,7 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
                     }
 
                 }
+                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
                 break;
             case MotionEvent.ACTION_UP:
 
@@ -181,10 +183,11 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
                         Toast.makeText(this.getContext(),view.getTag()+"",Toast.LENGTH_LONG).show();
                     }
                 }
+                Log.e(TAG,"ACTION_UP-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
                 break;
         }
 
-        return this.detector.onTouchEvent(ev);
+        return true;
     }
     private View getClickItem(final int rawX, final int rawY) {
         for (int i = 0; i < getChildCount(); i++) {

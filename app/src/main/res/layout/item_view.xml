@@ -2,13 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <Button
+    <com.situ.com.myscrollview.BallViewButton
         android:id="@+id/bt"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:background="@drawable/bg_item"
+        android:background="@drawable/bg_item_normal"
         android:text="1"
         android:textSize="11sp"
         >
-    </Button>
+    </com.situ.com.myscrollview.BallViewButton>
 </FrameLayout>

@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="bg_start_color">#1d74f2</color>
     <color name="bg_end_color">#1ac9fc</color>
+    <color name="bg_p_start_color">#AA1d74f2</color>
+    <color name="bg_p_end_color">#AA1ac9fc</color>
 </resources>

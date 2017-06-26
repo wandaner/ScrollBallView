@@ -18,6 +18,7 @@ public class MyBallViewAdapter extends BallViewAdapter {
         View view = View.inflate(mContext,R.layout.item_view,null);
         Button bt = (Button) view.findViewById(R.id.bt);
         bt.setText(""+(t+1));
+        bt.setClickable(false);
         view.setTag(t);
         return view;
     }
