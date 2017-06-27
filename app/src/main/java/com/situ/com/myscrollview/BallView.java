@@ -16,7 +16,7 @@ import android.widget.Toast;
  * Created by xukai on 2017/6/23.
  */
 
-public class BallView extends ViewGroup implements GestureDetector.OnGestureListener {
+public class BallView extends ViewGroup {
     private static final String TAG = "xukai.ballView";
     private Context context;
     private int AllNum = 100;
@@ -57,47 +57,7 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
         init();
     }
 
-    private void init(){
-        detector = new GestureDetector(this);
-//        initSize();
-//        initView();
-    }
-    private void initView(){
-        if(n==0||m==0){
-            return;
-        }
-        int index = 0;
-        for(int i=0;i<m;i++){
-            for(int j=0;j<n;j++){
-                View view = View.inflate(context,R.layout.item_view,null);
-                Button bt = (Button) view.findViewById(R.id.bt);
-                bt.setText(""+(index+1));
-                this.addView(view);
-                view.setTag(index++);
-            }
-        }
-    }
-    private void initSize(){
-        if(ballViewWidth ==0|| ballViewHeight ==0){
-            ballViewWidth = Utils.GetScreenWidth(context);
-            ballViewHeight = Utils.GetScreenHeight(context);
-        }
-        if(itemWidth==0||itemHeight==0){
-            View view = View.inflate(context, R.layout.item_view, null);
-            int w = View.MeasureSpec.makeMeasureSpec(0,
-                    View.MeasureSpec.UNSPECIFIED);
-            int h = View.MeasureSpec.makeMeasureSpec(0,
-                    View.MeasureSpec.UNSPECIFIED);
-
-            view.measure(w, h);
-            itemWidth = view.getMeasuredWidth();
-            itemHeight = view.getMeasuredHeight();
-        }
-        this.m = (ballViewWidth -padding)/(itemWidth+margin_row)+2;
-        this.n = (ballViewHeight -padding)/(itemHeight+margin_col)+1;
-        Log.e(TAG,"screen:"+ ballViewWidth +"*"+ ballViewHeight
-                +"\r\nitem:"+itemWidth+"*"+itemHeight);
-        Log.e(TAG,"n->"+n+"   m->"+m);
+    private void init() {
     }
 
     @Override
@@ -124,12 +84,11 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
             }
         }
     }
-    private boolean isMoveAction = false;//false:不可移动；true:可以移动
     private float mLastMotionX;
     private float mLastMotionY;
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         //获取触摸事件在按钮上的位置(记录初始位置)
         float startX = (float) 0.0;
         float startY = (float) 0.0;
@@ -142,19 +101,15 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // 重置isMoveAction
-                isMoveAction = false;
                 // 获取 motionX & motionY
                 mLastMotionX = x;
                 mLastMotionY = y;
                 // 记录点击事件点下的位置，用于判断点击或者滑动
                 startX = x;
                 startY = y;
-                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
+                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:");
                 break;
             case MotionEvent.ACTION_MOVE:
-                // When action move set isMoveAction true.
-                isMoveAction = true;
                 // 单指触摸
                 if (ev.getPointerCount() == 1) {
                     // Compute delta X.Y
@@ -164,30 +119,25 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
                     deltaY = (int) (y - mLastMotionY);
                     mLastMotionX = x;
                     mLastMotionY = y;
-                    if(!isMoveAction) {
-                        if (Math.pow(x - startX, 2) + Math.pow(y - startY, 2) > 20) {
-                            isMoveAction = true;
-                        }
-                    }else {
-                        //TODO 判断是否可以移动才可以移动，判断未加
-                    }
-
+                    //TODO 判断是否可以移动才可以移动，判断未加
+                    ScrollView(deltaX,deltaY);
                 }
-                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
+                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:");
                 break;
             case MotionEvent.ACTION_UP:
-
-                if (!isMoveAction) {
-                    View view = getClickItem(rawX, rawY);
-                    if (view != null) {
-                        Toast.makeText(this.getContext(),view.getTag()+"",Toast.LENGTH_LONG).show();
-                    }
-                }
-                Log.e(TAG,"ACTION_UP-->:x"+x+"   y:"+y+"   isMoveAction:"+isMoveAction);
                 break;
         }
-
-        return true;
+        return super.onInterceptTouchEvent(ev);
+    }
+    private void ScrollView(int deltaX,int deltaY){
+        moveChildView(deltaX,deltaY);
+    }
+    private void moveChildView(int deltaX,int deltaY) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            child.layout(child.getLeft() + deltaX, child.getTop()+deltaY,
+                    child.getRight() + deltaX, child.getBottom()+deltaY);
+        }
     }
     private View getClickItem(final int rawX, final int rawY) {
         for (int i = 0; i < getChildCount(); i++) {
@@ -251,35 +201,5 @@ public class BallView extends ViewGroup implements GestureDetector.OnGestureList
 
     public void setM(int m) {
         this.m = m;
-    }
-    //GestureDetector 的接口实现
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
     }
 }
