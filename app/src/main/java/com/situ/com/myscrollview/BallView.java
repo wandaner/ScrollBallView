@@ -1,6 +1,7 @@
 package com.situ.com.myscrollview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -42,6 +43,18 @@ public class BallView extends ViewGroup {
     private int margin_col = 10;//纵向间距
     private int padding = 10;//距边
 
+
+    //为了滚动的三view参数(横向)
+    private int mPreIndex;//最后一个控件的位置
+    private int mCurrentIndex;//第一个控件的位置
+    private View mCurrentView;
+    private View mPreView;
+
+
+    private int mPreIndex1;//最后一个控件的位置
+    private int mCurrentIndex1;//第一个控件的位置
+    private View mCurrentView1;
+    private View mPreView1;
     private GestureDetector detector;
 
     private BallViewAdapter adapter;
@@ -59,7 +72,17 @@ public class BallView extends ViewGroup {
 
     private void init() {
     }
+    private void initIndex(){
+        mCurrentIndex = 0;//视图阵第一个元素的id
+        mPreIndex = n*m-1;//视图阵最后一个元素的id
+        mCurrentView = getChildAt(mCurrentIndex);
+        mPreView = getChildAt(mPreIndex);
 
+        mCurrentIndex1 = 0;//视图阵第一个元素的id
+        mPreIndex1 = n*m-1;//视图阵最后一个元素的id
+        mCurrentView1 = getChildAt(mCurrentIndex1);
+        mPreView1 = getChildAt(mPreIndex1);
+    }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -89,30 +112,22 @@ public class BallView extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        //获取触摸事件在按钮上的位置(记录初始位置)
-        float startX = (float) 0.0;
-        float startY = (float) 0.0;
         //获取触摸事件在按钮上的位置
         final float x = ev.getX();
         final float y = ev.getY();
-        //获取触摸事件在屏幕上的位置
-        final int rawX = (int) ev.getRawX();
-        final int rawY = (int) ev.getRawY();
 
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // 获取 motionX & motionY
+                // 更新最 新的触摸事件想x,y
                 mLastMotionX = x;
                 mLastMotionY = y;
                 // 记录点击事件点下的位置，用于判断点击或者滑动
-                startX = x;
-                startY = y;
-                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:");
+//                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:");
                 break;
             case MotionEvent.ACTION_MOVE:
                 // 单指触摸
                 if (ev.getPointerCount() == 1) {
-                    // Compute delta X.Y
+                    // 计算偏移量
                     int deltaX = 0;
                     int deltaY = 0;
                     deltaX = (int) (x - mLastMotionX);
@@ -122,15 +137,150 @@ public class BallView extends ViewGroup {
                     //TODO 判断是否可以移动才可以移动，判断未加
                     ScrollView(deltaX,deltaY);
                 }
-                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:");
+//                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:");
                 break;
             case MotionEvent.ACTION_UP:
                 break;
         }
         return super.onInterceptTouchEvent(ev);
     }
-    private void ScrollView(int deltaX,int deltaY){
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        //获取触摸事件在按钮上的位置
+        final float x = ev.getX();
+        final float y = ev.getY();
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                // 更新最 新的触摸事件想x,y
+                mLastMotionX = x;
+                mLastMotionY = y;
+                // 记录点击事件点下的位置，用于判断点击或者滑动
+//                Log.e(TAG,"ACTION_DOWN-->:x"+x+"   y:"+y+"   isMoveAction:");
+                break;
+            case MotionEvent.ACTION_MOVE:
+                // 单指触摸
+                if (ev.getPointerCount() == 1) {
+                    // 计算偏移量
+                    int deltaX = 0;
+                    int deltaY = 0;
+                    deltaX = (int) (x - mLastMotionX);
+                    deltaY = (int) (y - mLastMotionY);
+                    mLastMotionX = x;
+                    mLastMotionY = y;
+                    //TODO 判断是否可以移动才可以移动，判断未加
+                    ScrollView(deltaX,deltaY);
+                }
+//                Log.e(TAG,"ACTION_MOVE-->:x"+x+"   y:"+y+"   isMoveAction:");
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+        }
+        return true;
+    }
+
+    private void ScrollView(int deltaX, int deltaY){
         moveChildView(deltaX,deltaY);
+        if(deltaY<0){
+            moveUp();
+        }else {
+            moveDown();
+        }
+        if(deltaX<0){
+            moveLeft();
+        }else {
+            moveRight();
+        }
+
+    }
+    private void moveLeft(){
+        if(mCurrentView.getRight()<0){
+            int cur_col = mCurrentIndex/n;
+            int pre_col = mPreIndex/n;
+            int cur_col_first_id = cur_col*n;
+            int pre_col_first_id = pre_col*n;
+            for(int i = 0;i<n;i++) {
+                View cur_view = getChildAt(i+cur_col_first_id);
+                View pre_view = getChildAt(i+pre_col_first_id);
+                cur_view.layout(
+                        pre_view.getRight() + margin_row,
+                        pre_view.getTop(),
+                        pre_view.getRight() + margin_row + itemWidth,
+                        pre_view.getBottom()
+                );
+            }
+            mPreIndex = cur_col_first_id+n-1;
+            mCurrentIndex = (mCurrentIndex+n)%(n*m);
+            mCurrentView = getChildAt(mCurrentIndex);
+            moveLeft();
+        }
+    }
+    private void moveRight(){
+        if(mCurrentView.getLeft()>margin_row){
+            int cur_col = mCurrentIndex/n;
+            int pre_col = mPreIndex/n;
+            int cur_col_first_id = cur_col*n;
+            int pre_col_first_id = pre_col*n;
+            for(int i = 0;i<n;i++) {
+                View cur_view = getChildAt(i+cur_col_first_id);
+                View pre_view = getChildAt(i+pre_col_first_id);
+                pre_view.layout(
+                        cur_view.getLeft() - margin_row - itemWidth,
+                        cur_view.getTop(),
+                        cur_view.getLeft() - margin_row,
+                        cur_view.getBottom()
+                );
+            }
+            mCurrentIndex = pre_col_first_id;
+            mPreIndex = (mPreIndex+n*m-n)%(n*m);
+            mCurrentView = getChildAt(mCurrentIndex);
+            moveRight();
+        }
+    }
+    private void moveUp(){
+        if(mCurrentView1.getBottom()<0){
+            int cur_col = mCurrentIndex1/n;
+            int pre_col = mPreIndex1/n;
+            int cur_col_first_id = mCurrentIndex1%n;
+            int pre_col_first_id = mPreIndex1%n;
+            for(int i = 0;i<m;i++) {
+                View cur_view = getChildAt(i*n+cur_col_first_id);
+                View pre_view = getChildAt(i*n+pre_col_first_id);
+                cur_view.layout(
+                        pre_view.getLeft(),
+                        pre_view.getBottom()+margin_col,
+                        pre_view.getRight(),
+                        pre_view.getBottom()+margin_col+itemHeight
+                );
+            }
+            mPreIndex1 = cur_col_first_id+pre_col*n;
+            mCurrentIndex1 = (cur_col_first_id+1)%n+cur_col*n;
+            mCurrentView1 = getChildAt(mCurrentIndex1);
+            moveUp();
+        }
+    }
+    private void moveDown(){
+        if(mCurrentView1.getTop()>margin_col){
+            int cur_col = mCurrentIndex1/n;
+            int pre_col = mPreIndex1/n;
+            int cur_col_first_id = mCurrentIndex1%n;
+            int pre_col_first_id = mPreIndex1%n;
+            for(int i = 0;i<m;i++) {
+                View cur_view = getChildAt(i*n+cur_col_first_id);
+                View pre_view = getChildAt(i*n+pre_col_first_id);
+                pre_view.layout(
+                        cur_view.getLeft(),
+                        cur_view.getTop()-margin_col-itemHeight,
+                        cur_view.getRight(),
+                        cur_view.getTop()-margin_col
+                );
+            }
+            mCurrentIndex1 = pre_col_first_id + cur_col*n;
+            mPreIndex1 = (pre_col_first_id+n-1)%n+pre_col*n;
+            mCurrentView1 = getChildAt(mCurrentIndex1);
+            moveDown();
+        }
     }
     private void moveChildView(int deltaX,int deltaY) {
         for (int i = 0; i < getChildCount(); i++) {
@@ -159,6 +309,7 @@ public class BallView extends ViewGroup {
         adapter.setMaxContext(m*n);
 //        adapter.setMaxRow();
         adapter.initView(0);
+        initIndex();
     }
     //getter & setter
     public int getBallViewWidth(){

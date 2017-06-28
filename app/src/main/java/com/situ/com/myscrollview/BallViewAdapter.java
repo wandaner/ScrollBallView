@@ -11,13 +11,13 @@ import android.widget.Button;
 
 public abstract class BallViewAdapter{
     private static final String TAG = "xukai.ballViewAdapter";
-    public int num;//总计Num
+    private int num;//总计Num
     public Context mContext;
-    public BallView ballView;
-    public int bv_maxContext;//每页最大的实际button数=bv_realRow * bv_realCol
-    public int bv_maxRow;//每一列最大的的虚拟行数
-    public int bv_realRow;//ballView创建的实际行数
-    public int bv_realCol;//ballView创建的实际列数
+    private BallView ballView;
+    private int bv_maxContext;//每页最大的实际button数=bv_realRow * bv_realCol
+    private int bv_maxRow;//每一列最大的的虚拟行数
+    private int bv_realRow;//ballView创建的实际行数
+    private int bv_realCol;//ballView创建的实际列数
     public BallViewAdapter(Context context,int num){
         this.mContext = context;
         this.num = num;
@@ -33,10 +33,15 @@ public abstract class BallViewAdapter{
                 break;
             }
             View view = getView(i);
-//            computeItemSize(view);
             ballView.addView(view);
             count++;
         }
+//        for(int m = 0;m<bv_realCol;m++) {
+//            for (int n = 0; n < bv_realRow; n++) {
+//
+//
+//            }
+//        }
 
     }
     public void setMaxContext(int maxContext){

@@ -38,21 +38,23 @@ public class BallViewButton extends Button {
                 startX = event.getRawX();
                 startY = event.getRawY();
 //                setBackgroundResource(R.drawable.bg_item_press);
-                Log.e("xukai.button","------------------>ACTION_DOWN:"+startX+"*"+startY);
+//                Log.e("xukai.button","------------------>ACTION_DOWN:"+startX+"*"+startY);
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.e("xukai.button","------------------>ACTION_MOVE");
+//                Log.e("xukai.button","------------------>ACTION_MOVE");
                 break;
             case MotionEvent.ACTION_UP:
                 float x = event.getRawX();
                 float y = event.getRawY();
-                Log.e("xukai.button","------------------->Up:"+x+"*"+y+"    "+startX+"*"+startY);
+//                Log.e("xukai.button","------------------->Up:"+x+"*"+y+"    "+startX+"*"+startY);
                 float re = (float) (Math.pow((x-startX),2)+Math.pow((y-startY),2));
 //                Log.e("xukai.button","------------------>"+re);
                 if(re<10){
                     ClickCallBack();
                 }
 //                Log.e("xukai.button","------------------>ACTION_UP");
+                break;
+            default:
                 break;
         }
         return super.onTouchEvent(event);
